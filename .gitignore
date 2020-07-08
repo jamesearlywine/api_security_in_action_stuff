@@ -7,4 +7,5 @@ target/
 *.iml
 .idea/
 **/.idea/
-.eclipse.DS_Store
+.eclipse
+.DS_Store
