@@ -1,0 +1,13 @@
+curl -d '{"name":"test", "owner":"a really long username that is more than 30 characters long"}' http://localhost:4567/spaces -i
+
+
+curl -i -d "{\"owner\":\"test\",\"name\":\"space$i\"}" -H 'Content-Type: application/json' http://localhost:4567/spaces
+
+## register a user
+curl -ik -d "{\"username\":\"test\",\"password\":\"password\"}" -H 'Content-Type: application/json' https://localhost:4567/users
+
+
+for i in {1..5}; do curl -i -d "{\"owner\":\"test\",\"name\":\"space$i\"}" -H 'Content-Type: application/json' http://localhost:4567/spaces; done;
+
+
+curl -ik -H 'Content-Type: application/json' -u test:password -X POST https://localhost:4567/sessions {"token":"eyJzdWIiOiJ0ZXN0IiwiZXhwIjoxNTU5NTgyMTI5LCJhdHRycyI6e319.INFgLC3cAhJ8DjzPgQfHBHvU_uItnFjt568mQ43V7YI"}

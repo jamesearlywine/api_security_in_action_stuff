@@ -1,5 +1,6 @@
 package com.manning.apisecurityinaction;
 
+import static spark.Service.SPARK_DEFAULT_PORT;
 import static spark.Spark.*;
 
 import java.nio.file.*;
@@ -22,10 +23,12 @@ import spark.embeddedserver.jetty.EmbeddedJettyFactory;
 
 public class Main {
 
-    private static final String jdbc_url_old = "jdbc:h2:mem:natter";
-    private static final String jdbc_url = "jdbc:h2:tcp://localhost/~/stackoverflow";
+    private static final String jdbc_url = "jdbc:h2:mem:natter";
+    private static final String jdbc_url_tcp = "jdbc:h2:tcp://localhost/~/stackoverflow";
 
     public static void main(String... args) throws Exception {
+        port(args.length > 0 ? Integer.parseInt(args[0]) : SPARK_DEFAULT_PORT);
+
         EmbeddedServers.add(EmbeddedServers.defaultIdentifier(),
                 new EmbeddedJettyFactory().withHttpOnly(true));
         Spark.staticFiles.location("/public");

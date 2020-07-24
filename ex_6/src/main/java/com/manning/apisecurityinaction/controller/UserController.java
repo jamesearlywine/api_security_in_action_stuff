@@ -42,6 +42,7 @@ public class UserController {
                         " VALUES(?, ?)", username, hash);
 
         response.status(201);
+        response.header("Content-Type", "application/json");
         response.header("Location", "/users/" + username);
         return new JSONObject().put("username", username);
     }
