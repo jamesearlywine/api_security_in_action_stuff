@@ -3,8 +3,11 @@ package com.manning.apisecurityinaction.token;
 import com.nimbusds.jose.*;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import net.minidev.json.JSONObject;
 import spark.Request;
 
+import java.text.ParseException;
+import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
 
@@ -48,8 +51,29 @@ public class SignedJwtTokenStore implements TokenStore {
 
     @Override
     public Optional<Token> read(Request request, String tokenId) {
-        // TODO
-        return Optional.empty();
+        try {
+            SignedJWT jwt = SignedJWT.parse(tokenId);
+            if (!jwt.verify(verifier)) {
+                throw new JOSEException("Invalid signature");
+            }
+
+            JWTClaimsSet claims = jwt.getJWTClaimsSet();
+            if (!claims.getAudience().contains(audience)) {
+                throw new JOSEException("Incorrect audience");
+            }
+
+            Instant expiry = claims.getExpirationTime().toInstant();
+            String subject = claims.getSubject();
+            Token token = new Token(expiry, subject);
+            JSONObject attrs = claims.getJSONObjectClaim("attrs");
+            attrs.forEach((key, value) -> {
+                token.attributes.put(key, (String) value);
+            });
+
+            return Optional.of(token);
+        } catch (JOSEException | ParseException e) {
+            return Optional.empty();
+        }
     }
 
     @Override

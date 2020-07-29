@@ -3,14 +3,19 @@ package com.manning.apisecurityinaction;
 import com.google.common.util.concurrent.RateLimiter;
 import com.manning.apisecurityinaction.controller.*;
 import com.manning.apisecurityinaction.token.*;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
 import org.dalesbred.Database;
 import org.dalesbred.result.EmptyResultException;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.json.*;
+import software.pando.crypto.nacl.SecretBox;
 import spark.*;
 import spark.embeddedserver.EmbeddedServers;
 import spark.embeddedserver.jetty.EmbeddedJettyFactory;
 
+import javax.crypto.SecretKey;
 import java.io.FileInputStream;
 import java.nio.file.*;
 import java.security.KeyStore;
@@ -63,11 +68,30 @@ public class Main {
         keyStore.load(new FileInputStream("keystore.p12"),
                 keyPassword);
         var macKey = keyStore.getKey("hmac-key", keyPassword);
+        var encKey = keyStore.getKey("aes-key", keyPassword);
+        var naclKey = SecretBox.key(encKey.getEncoded());
 
-        var databaseTokenStore = new DatabaseTokenStore(database);
-        var jsonTokenStore = new JsonTokenStore();
-        var tokenStore = new HmacTokenStore(jsonTokenStore, macKey);
-        var tokenController = new TokenController(tokenStore);
+        // var databaseTokenStore = new DatabaseTokenStore(database);
+        // var jsonTokenStore = new JsonTokenStore();
+        // var hmacTokenStore = new HmacTokenStore(jsonTokenStore, macKey);
+        String audience = "https://localhost:4567";
+        JWSAlgorithm algorithm = JWSAlgorithm.HS256;
+        MACSigner macSigner = new MACSigner((SecretKey) macKey);
+        MACVerifier macVerifier = new MACVerifier((SecretKey) macKey);
+
+        /*
+        TokenStore tokenStore = new SignedJwtTokenStore(
+            macSigner,
+            macVerifier,
+            algorithm,
+            audience
+        );
+         */
+        var tokenStore = new EncryptedTokenStore(
+            new JsonTokenStore(), naclKey
+        );
+
+        TokenController tokenController = new TokenController(tokenStore);
 
         before(userController::authenticate);
         before(tokenController::validateToken);
@@ -113,10 +137,12 @@ public class Main {
             moderatorController::deletePost);
 
         before("/expired_tokens", userController::requireAuthentication);
+        /*
         delete("/expired_tokens", (request, response) -> {
             databaseTokenStore.deleteExpiredTokens();
             return new JSONObject();
         });
+         */
 
         afterAfter((request, response) -> {
             response.type("application/json; charset=utf-8");

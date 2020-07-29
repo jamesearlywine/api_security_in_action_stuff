@@ -11,3 +11,44 @@ for i in {1..5}; do curl -i -d "{\"owner\":\"test\",\"name\":\"space$i\"}" -H 'C
 
 
 curl -ik -H 'Content-Type: application/json' -u test:password -X POST https://localhost:4567/sessions {"token":"eyJzdWIiOiJ0ZXN0IiwiZXhwIjoxNTU5NTgyMTI5LCJhdHRycyI6e319.INFgLC3cAhJ8DjzPgQfHBHvU_uItnFjt568mQ43V7YI"}
+
+brass $50 for 500
+bullets $50 for 500
+primers $20 for 500
+powder $10 for 500
+
+822
+Single-Core Score
+1970
+Multi Score
+
+1118
+Single-Core Score
+6768
+MultiScore
+
+
+# register new user, without escaped characters in request body
+curl -ik -H 'Content-Type: application/json' -d '{"username":"test","password":"password"}' https://localhost:4567/users
+curl -ik -H 'Content-Type: application/json' -u test:password -d '' https://localhost:4567/sessions
+
+
+curl -ik -H 'Content-Type: application/json' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiYXVkIjoiaHR0cHM6XC9cL2xvY2FsaG9zdDo0NTY3IiwiZXhwIjoxNTk1OTA5MTE0LCJhdHRycyI6e319.ihWKrVr9lQxGDXX1lX6hh9jHgVg407PsFfFMTCdoGy0' -d '{"owner":"test","name":"test space"}' https://localhost:4567/spaces -i
+
+
+
+mvn clean compile exec:java -Dkeystore.password=changeit&
+
+
+eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiYXVkIjoiaHR0cHM6XC9cL2xvY2FsaG9zdDo0NTY3IiwiZXhwIjoxNTk1NjQ4MTQzLCJhdHRycyI6e319.-SrxYHU3mtMKzjhcUmQqCfYiDfgwDbjVYr0YJTnTvtI
+
+[B@4677b82e
+
+eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiYXVkIjoiaHR0cHM6XC9cL2xvY2FsaG9zdDo0NTY3IiwiZXhwIjoxNTk1NzM4MDk5LCJhdHRycyI6e319.MMVkTsQoFr9gW72Gsi6ALrZl7oVujIO5z5ii2ZHRMQA
+
+
+
+keytool -genseckey -keyalg AES -keysize 256 -alias aes-key -keystore keystore.p12 -storepass changeit
+
+"aM9Nke6wcU8qtO5KFcg0v4WR05UOxIjfSAAAADsBla1C8ldRz-NaSmFlNIib9YqOIDe9StcdQ6IfvWZP2Usf7fHaRKfFhgvBBR1q6GGYUFSDGGqNtwpwZCuamWpaXr-SXJZzrQ"
+
